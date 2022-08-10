@@ -23,12 +23,17 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
         paginationItemsPerPage: 10,
         paginationMaximumItemsPerPage: 100,
         paginationClientItemsPerPage: true,
+        collectionOperations: [
+            'get',
+            'post' => ['security' => 'is_granted("ROLE_ADMIN")']
+        ],
         itemOperations: [
             'get',
             'patch' => [
-                'denormalization_context' => ['groups' => ['product.patch']]
+                'denormalization_context' => ['groups' => ['product.patch']],
+                'security' => 'is_granted("ROLE_ADMIN")'
             ],
-            'delete'
+            'delete' => ['security' => 'is_granted("ROLE_ADMIN")']
         ]
         ),
         ApiFilter(
@@ -43,7 +48,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
         ),
         ApiFilter(
             OrderFilter::class,
-            properties: ['issueAt']
+            properties: ['issueAt', 'name']
         )
 ]
 class Product

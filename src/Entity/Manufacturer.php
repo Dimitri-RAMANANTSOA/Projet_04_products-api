@@ -21,16 +21,21 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /** A Manufacturer */
 #[ApiResource(
     normalizationContext: ['groups' => ['manufacturer.read']],
-        denormalizationContext: ['groups' => ['manufacturer.write']],
+    denormalizationContext: ['groups' => ['manufacturer.write']],
     paginationItemsPerPage: 10,
     paginationMaximumItemsPerPage: 100,
     paginationClientItemsPerPage: true,
+    collectionOperations: [
+        'get',
+        'post' => ['security' => 'is_granted("ROLE_ADMIN")']
+    ],
     itemOperations: [
         'get',
         'patch' => [
-            'denormalization_context' => ['groups' => ['manufacturer.patch']]
+            'denormalization_context' => ['groups' => ['manufacturer.patch']],
+            'security' => 'is_granted("ROLE_ADMIN")'
         ],
-        'delete'
+        'delete' => ['security' => 'is_granted("ROLE_ADMIN")']
     ]
 )]
 class Manufacturer
@@ -62,7 +67,6 @@ class Manufacturer
 
     #[ORM\Column(length: 255)]
     #[
-        Length(min: 5),
         NotBlank(),
         Country(),
         Groups(['manufacturer.read','manufacturer.write','manufacturer.patch'])
