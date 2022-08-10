@@ -17,7 +17,13 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 #[ORM\Entity(repositoryClass: ManufacturerRepository::class)]
 /** A Manufacturer */
-#[ApiResource]
+#[ApiResource(
+    itemOperations: [
+        'get',
+        'patch',
+        'delete'
+    ]
+)]
 class Manufacturer
 {
     #[ORM\Id]

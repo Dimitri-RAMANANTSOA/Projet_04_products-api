@@ -5,14 +5,38 @@ namespace App\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\ProductRepository;
+use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\Validator\Constraints\Date;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
 /** A Product */
-#[ApiResource]
+#[
+    ApiResource(
+        itemOperations: [
+            'get',
+            'patch',
+            'delete'
+        ]
+        ),
+        ApiFilter(
+            SearchFilter::class,
+            properties: [
+                'name' => 'partial',
+                'description' => 'partial',
+                'manufacturer.name' => 'partial',
+                'manufacturer.countryCode' => 'exact'
+            ]
+        ),
+        ApiFilter(
+            OrderFilter::class,
+            properties: ['issueAt']
+        )
+]
 class Product
 {
     #[ORM\Id]
