@@ -8,6 +8,7 @@ use App\Repository\ProductRepository;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\Validator\Constraints\Date;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
@@ -17,9 +18,16 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 /** A Product */
 #[
     ApiResource(
+        normalizationContext: ['groups' => ['product.read']],
+        denormalizationContext: ['groups' => ['product.write']],
+        paginationItemsPerPage: 10,
+        paginationMaximumItemsPerPage: 100,
+        paginationClientItemsPerPage: true,
         itemOperations: [
             'get',
-            'patch',
+            'patch' => [
+                'denormalization_context' => ['groups' => ['product.patch']]
+            ],
             'delete'
         ]
         ),
@@ -28,6 +36,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
             properties: [
                 'name' => 'partial',
                 'description' => 'partial',
+                'manufacturer.id' => 'exact',
                 'manufacturer.name' => 'partial',
                 'manufacturer.countryCode' => 'exact'
             ]
@@ -42,13 +51,15 @@ class Product
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['product.read'])]
     /** Product ID */
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[
         Length(min: 5, max: 255),
-        NotBlank()
+        NotBlank(),
+        Groups(['product.read','product.write','product.patch'])
     ]
     /** The MPN (Manufacturer Part Number) of the product */
     private ?string $mpn = null;
@@ -56,7 +67,8 @@ class Product
     #[ORM\Column(length: 255)]
     #[
         Length(min: 5, max: 255),
-        NotBlank()
+        NotBlank(),
+        Groups(['product.read','product.write','product.patch','manufacturer.read'])
     ]
     /** Product Name */
     private ?string $name = null;
@@ -64,21 +76,24 @@ class Product
     #[ORM\Column(length: 255)]
     #[
         Length(min: 10, max: 255),
-        NotBlank()
+        NotBlank(),
+        Groups(['product.read','product.write','product.patch'])
     ]
     /** Product description */
     private ?string $description = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[
-        NotBlank()
+        NotBlank(),
+        Groups(['product.read','product.write'])
     ]
     /** The date of issue of the product */
     private ?\DateTimeInterface $issueAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'products')]
     #[
-        NotBlank()
+        NotBlank(),
+        Groups(['product.read','product.write','product.patch'])
     ]
     /** The Manufacturer of the product */
     private ?Manufacturer $manufacturer = null;

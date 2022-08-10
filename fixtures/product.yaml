@@ -1,0 +1,7 @@
+App\Entity\Product:
+  product_{1..100}:
+    mpn: <isbn10()>
+    name: <word()>
+    description: <bs()>
+    issueAt: <dateTimeThisDecade()>
+    manufacturer: '@manufacturer_*'

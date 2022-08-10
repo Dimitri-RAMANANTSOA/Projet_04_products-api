@@ -85,6 +85,9 @@
         }
     },
     "require-dev": {
+        "doctrine/doctrine-fixtures-bundle": "^3.4",
+        "fakerphp/faker": "^1.20",
+        "hautelook/alice-bundle": "^2.11",
         "symfony/maker-bundle": "^1.45"
     }
 }
